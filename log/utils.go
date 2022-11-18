@@ -3,19 +3,10 @@ package log
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"runtime"
 	"strings"
 	"time"
 )
-
-type logCustom struct {
-	Logrus  *logrus.Logger
-	WhoAmI  iAm
-	isDbLog bool
-
-	LogDb *LogDbCustom
-}
 
 func responseTimeString(startTime time.Time) (timeInt int64, timeFmt string) {
 	if startTime.IsZero() {

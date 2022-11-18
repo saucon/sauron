@@ -3,7 +3,7 @@ package log_test
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"sauron/log"
+	"github.com/saucon/sauron/log"
 	"testing"
 	"time"
 )

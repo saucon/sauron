@@ -10,14 +10,22 @@ import (
 	"time"
 )
 
-var instance *logCustom
+var instance *LogCustom
 var once sync.Once
+
+type LogCustom struct {
+	Logrus *logrus.Logger
+	WhoAmI iAm
+	LogDb  *LogDbCustom
+
+	isDbLog bool
+}
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
-func NewLogCustom(configLog ConfigLog, isDbLog bool) *logCustom {
+func NewLogCustom(configLog ConfigLog, isDbLog bool) *LogCustom {
 	var log *logrus.Logger
 	startTime := time.Now()
 	configElstc := configLog.ElasticConfig
@@ -41,7 +49,7 @@ func NewLogCustom(configLog ConfigLog, isDbLog bool) *logCustom {
 	}
 
 	once.Do(func() {
-		instance = &logCustom{
+		instance = &LogCustom{
 			Logrus: log,
 			WhoAmI: iAm{
 				Name: configLog.Name,
@@ -54,7 +62,7 @@ func NewLogCustom(configLog ConfigLog, isDbLog bool) *logCustom {
 	return instance
 }
 
-func (l *logCustom) Success(data LogData) {
+func (l *LogCustom) Success(data LogData) {
 	data.level = LEVEL_SUCCESS
 
 	timeMs, timeFmt := responseTimeString(data.StartTime)
@@ -80,7 +88,7 @@ func (l *logCustom) Success(data LogData) {
 	}
 }
 
-func (l *logCustom) Info(data LogData) {
+func (l *LogCustom) Info(data LogData) {
 	data.level = LEVEL_INFO
 
 	timeMs, timeFmt := responseTimeString(data.StartTime)
@@ -106,7 +114,7 @@ func (l *logCustom) Info(data LogData) {
 	}
 }
 
-func (l *logCustom) Error(data LogData) {
+func (l *LogCustom) Error(data LogData) {
 	data.level = LEVEL_ERROR
 	errorCause := ""
 	errorString := ""
@@ -137,7 +145,7 @@ func (l *logCustom) Error(data LogData) {
 	}
 }
 
-func (l *logCustom) Fatal(data LogData) {
+func (l *LogCustom) Fatal(data LogData) {
 	data.level = LEVEL_FATAL
 	errorCause := ""
 	errorString := ""
