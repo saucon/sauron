@@ -1,7 +1,7 @@
 package main
 
 import (
-	"sauron/log"
+	"github.com/saucon/sauron/log"
 	"time"
 )
 
@@ -14,7 +14,7 @@ func main() {
 		Description: "main fatal",
 		StartTime:   timeStart,
 	})
-	
+
 	logger.Success(log.LogData{
 		Description: "main success",
 		StartTime:   timeStart,
