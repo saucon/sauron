@@ -1,4 +1,4 @@
-module sauron
+module github.com/saucon/sauron
 
 go 1.18
 
