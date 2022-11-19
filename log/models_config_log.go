@@ -8,10 +8,12 @@ const LEVEL_INFO = "info"
 const LEVEL_FATAL = "fatal"
 
 type ConfigLog struct {
-	Name          string `env:"NAME_SERVER"`
-	Port          string `env:"PORT_SERVER"`
-	Host          string `env:"HOST_SERVER"`
-	ElasticConfig ElasticConfig
+	Name string `env:"NAME_SERVER"`
+	Port string `env:"PORT_SERVER"`
+	Host string `env:"HOST_SERVER"`
+
+	HookElasicEnabled bool `env:"HOOK_ELASTIC_ENABLED"`
+	ElasticConfig     ElasticConfig
 }
 
 type ElasticConfig struct {

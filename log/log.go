@@ -28,24 +28,27 @@ type stackTracer interface {
 func NewLogCustom(configLog ConfigLog, isDbLog bool) *LogCustom {
 	var log *logrus.Logger
 	startTime := time.Now()
-	configElstc := configLog.ElasticConfig
 
 	log = logrus.New()
 	log.SetFormatter(&logrus.JSONFormatter{PrettyPrint: true})
 
-	client, err := elastic.NewClient(elastic.SetURL(
-		fmt.Sprintf("http://%v:%v", configElstc.Host, configElstc.Port)),
-		elastic.SetSniff(false),
-		elastic.SetBasicAuth(configElstc.User, configElstc.Password))
-	if err != nil {
-		selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
-	} else {
-		hook, err := elogrus.NewAsyncElasticHook(
-			client, configElstc.Host, logrus.DebugLevel, configElstc.Index)
+	// hook to elastic
+	if configLog.HookElasicEnabled {
+		configElstc := configLog.ElasticConfig
+		client, err := elastic.NewClient(elastic.SetURL(
+			fmt.Sprintf("http://%v:%v", configElstc.Host, configElstc.Port)),
+			elastic.SetSniff(false),
+			elastic.SetBasicAuth(configElstc.User, configElstc.Password))
 		if err != nil {
 			selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
+		} else {
+			hook, err := elogrus.NewAsyncElasticHook(
+				client, configElstc.Host, logrus.DebugLevel, configElstc.Index)
+			if err != nil {
+				selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
+			}
+			log.Hooks.Add(hook)
 		}
-		log.Hooks.Add(hook)
 	}
 
 	once.Do(func() {
