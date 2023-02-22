@@ -65,6 +65,11 @@ func NewLogCustom(configLog ConfigLog, isDbLog bool) *LogCustom {
 	return instance
 }
 
+func (l *LogCustom) SetFormatter(formatter logrus.Formatter) *LogCustom {
+	l.Logrus.SetFormatter(formatter)
+	return l
+}
+
 func (l *LogCustom) Success(data LogData) {
 	data.level = LEVEL_SUCCESS
 

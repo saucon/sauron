@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/saucon/sauron/log"
+	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
 )
 
 func BenchmarkFunction(b *testing.B) {
 
-	logger := log.NewLogCustom(log.ConfigLog{}, false)
+	logger := log.NewLogCustom(log.ConfigLog{}, false).SetFormatter(&logrus.JSONFormatter{})
 	err := errors.New("Error Baru nih")
 	timeStart := time.Now()
 
