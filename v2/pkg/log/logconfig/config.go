@@ -1,6 +1,6 @@
 package logconfig
 
-import "github.com/saucon/sauron/v2/pkg/env/configenv"
+import "github.com/saucon/sauron/v2/pkg/env/envconfig"
 
 type Config struct {
 	AppConfig App
@@ -32,6 +32,6 @@ type App struct {
 	EnvPrefix     string `mapstructure:"envPrefix"`
 }
 
-func (c *Config) SetAppConfig(app configenv.App) {
+func (c *Config) SetAppConfig(app envconfig.App) {
 	c.AppConfig = App(app)
 }

@@ -1,4 +1,4 @@
-package configenv
+package envconfig
 
 type Config struct {
 	AppConfig App `mapstructure:"app"`
