@@ -14,6 +14,11 @@ import (
 	"time"
 )
 
+const (
+	DRIVER_POSTGRES = "postgres"
+	DRIVER_MYSQL    = "mysql"
+)
+
 type Database struct {
 	DB *gorm.DB
 	l  *log.LogCustom
@@ -39,7 +44,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 	}()
 
 	switch driver {
-	case "postgres":
+	case DRIVER_POSTGRES:
 		host = conf.DBPostgresConfig[dbCfg].Host
 		port = conf.DBPostgresConfig[dbCfg].Port
 		user = conf.DBPostgresConfig[dbCfg].User
@@ -109,7 +114,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 			DB: DB,
 			l:  l,
 		}
-	case "mysql":
+	case DRIVER_MYSQL:
 		host = conf.DBMysqlConfig[dbCfg].Host
 		host = conf.DBMysqlConfig[dbCfg].Host
 		port = conf.DBMysqlConfig[dbCfg].Port

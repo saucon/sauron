@@ -31,6 +31,8 @@ func NewLogCustom(configLog *logconfig.Config, isDbLog bool) *LogCustom {
 	startTime := time.Now()
 	log := logrus.New()
 
+	log.SetFormatter(&logrus.JSONFormatter{PrettyPrint: false})
+
 	// Hook to elastic if enabled
 	if configLog.HookElasicEnabled {
 		configElstc := configLog.ElasticConfig

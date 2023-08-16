@@ -9,12 +9,12 @@ import (
 func main() {
 	timeStart := time.Now()
 
-	logger := log2.NewLogCustom(logconfig.Config{}, false)
+	logger := log2.NewLogCustom(&logconfig.Config{}, false)
 
-	logger.Fatal(log2.LogData{
-		Description: "main fatal",
-		StartTime:   timeStart,
-	})
+	//logger.Fatal(log2.LogData{
+	//	Description: "main fatal",
+	//	StartTime:   timeStart,
+	//})
 
 	logger.Success(log2.LogData{
 		Description: "main success",
