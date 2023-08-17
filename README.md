@@ -53,6 +53,35 @@ Call function with param ***create_ton*** in file main.go
 	})
 ```
 
+#### sample env file using format yml
+```
+database:
+  dbPostgres:
+    main_db:
+      name: ""
+      host: ""
+      port: "9993"
+      user: "postgres"
+      pass: ""
+      tz: "Asia/Jakarta"
+    test_db:
+      name: ""
+      host: ""
+      port: "9993"
+      user: "postgres"
+      pass: ""
+      tz: "Asia/Jakarta"
+  dbMysql:
+    main_db:
+      name: ""
+      host: ""
+      port: "3306"
+      user: ""
+      pass: ""
+      tz: "Local"
+  enableAutoMigration: false
+```
+
 ### Happy Working with Go, Coders!!
 
 ```
