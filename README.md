@@ -20,8 +20,6 @@ import (
 
 # Usage
 
-Call function with param ***create_ton*** in file main.go
-
 ##### DB
 ```
 	dbResult := db.NewDB(&dbconfig.Config{}, &log2.LogCustom{}, "config_db", "", false, "postgres")
