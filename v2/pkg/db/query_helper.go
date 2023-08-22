@@ -13,10 +13,10 @@ const (
 )
 
 type Query struct {
-	db    *gorm.DB
-	QType string
-	Query interface{}
-	Args  []interface{}
+	DbGorm *gorm.DB
+	QType  string
+	Query  interface{}
+	Args   []interface{}
 }
 
 func QueryArgs(qType string, query interface{}, args ...interface{}) Query {
@@ -28,22 +28,22 @@ func QueryArgs(qType string, query interface{}, args ...interface{}) Query {
 }
 
 func (q *Query) RunQuery(db *gorm.DB) *Query {
-	q.db = db
+	q.DbGorm = db
 	switch q.QType {
 	case QUERY_WHERE:
-		q.db = db.Debug().Where(q.Query, q.Args...)
+		q.DbGorm = db.Debug().Where(q.Query, q.Args...)
 		return q
 	case QUERY_ORDER:
-		q.db = db.Debug().Order(q.Query)
+		q.DbGorm = db.Debug().Order(q.Query)
 		return q
 	case QUERY_NOT:
-		q.db = db.Debug().Not(q.Query, q.Args...)
+		q.DbGorm = db.Debug().Not(q.Query, q.Args...)
 		return q
 	case QUERY_OR:
-		q.db = db.Debug().Or(q.Query, q.Args...)
+		q.DbGorm = db.Debug().Or(q.Query, q.Args...)
 		return q
 	case QUERY_SELECT:
-		q.db = db.Debug().Select(q.Query, q.Args...)
+		q.DbGorm = db.Debug().Select(q.Query, q.Args...)
 		return q
 	case QUERY_GROUP:
 		var qStr string
@@ -53,10 +53,10 @@ func (q *Query) RunQuery(db *gorm.DB) *Query {
 			qStr = ""
 		}
 
-		q.db = db.Debug().Group(qStr)
+		q.DbGorm = db.Debug().Group(qStr)
 		return q
 	case QUEERY_HAVING:
-		q.db = db.Debug().Having(q.Query, q.Args...)
+		q.DbGorm = db.Debug().Having(q.Query, q.Args...)
 		return q
 	default:
 		return q
