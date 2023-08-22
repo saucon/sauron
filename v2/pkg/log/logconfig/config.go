@@ -3,8 +3,7 @@ package logconfig
 import "github.com/saucon/sauron/v2/pkg/env/envconfig"
 
 type Config struct {
-	AppConfig App
-
+	AppConfig         App
 	HookElasicEnabled bool          `env:"hookElasticEnabled"`
 	ElasticConfig     ElasticConfig `mapstructure:"elastic"`
 }
