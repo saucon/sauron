@@ -3,13 +3,15 @@ package db
 import "gorm.io/gorm"
 
 const (
-	QUERY_WHERE   string = "where"
-	QUERY_ORDER   string = "order"
-	QUERY_NOT     string = "not"
-	QUERY_OR      string = "or"
-	QUERY_SELECT  string = "select"
-	QUERY_GROUP   string = "group"
-	QUEERY_HAVING string = "having"
+	QUERY_WHERE  string = "where"
+	QUERY_ORDER  string = "order"
+	QUERY_NOT    string = "not"
+	QUERY_OR     string = "or"
+	QUERY_SELECT string = "select"
+	QUERY_GROUP  string = "group"
+	QUERY_HAVING string = "having"
+	QUERY_OFFSET string = "offset"
+	QUERY_LIMIT  string = "limit"
 )
 
 type Query struct {
@@ -52,11 +54,28 @@ func (q *Query) RunQuery(db *gorm.DB) *Query {
 		} else {
 			qStr = ""
 		}
-
 		q.DbGorm = db.Debug().Group(qStr)
 		return q
-	case QUEERY_HAVING:
+	case QUERY_HAVING:
 		q.DbGorm = db.Debug().Having(q.Query, q.Args...)
+		return q
+	case QUERY_OFFSET:
+		var qInt int
+		if s, ok := q.Query.(int); ok {
+			qInt = s
+		} else {
+			qInt = -1
+		}
+		q.DbGorm = db.Debug().Offset(qInt)
+		return q
+	case QUERY_LIMIT:
+		var qInt int
+		if s, ok := q.Query.(int); ok {
+			qInt = s
+		} else {
+			qInt = -1
+		}
+		q.DbGorm = db.Debug().Limit(qInt)
 		return q
 	default:
 		return q
