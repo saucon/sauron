@@ -12,6 +12,7 @@ const (
 	QUERY_HAVING string = "having"
 	QUERY_OFFSET string = "offset"
 	QUERY_LIMIT  string = "limit"
+	QUERY_JOIN   string = "join"
 )
 
 type Query struct {
@@ -34,6 +35,15 @@ func (q *Query) RunQuery(db *gorm.DB) *Query {
 	switch q.QType {
 	case QUERY_WHERE:
 		q.DbGorm = db.Debug().Where(q.Query, q.Args...)
+		return q
+	case QUERY_JOIN:
+		var qStr string
+		if s, ok := q.Query.(string); ok {
+			qStr = s
+		} else {
+			qStr = ""
+		}
+		q.DbGorm = db.Debug().Joins(qStr, q.Args...)
 		return q
 	case QUERY_ORDER:
 		q.DbGorm = db.Debug().Order(q.Query)
