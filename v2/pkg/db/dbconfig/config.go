@@ -7,10 +7,11 @@ type Config struct {
 }
 
 type DB struct {
-	Name string `mapstructure:"name"`
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
-	User string `mapstructure:"user"`
-	Pass string `mapstructure:"pass"`
-	Tz   string `mapstructure:"tz"`
+	Name                string `mapstructure:"name"`
+	Host                string `mapstructure:"host"`
+	Port                string `mapstructure:"port"`
+	User                string `mapstructure:"user"`
+	Pass                string `mapstructure:"pass"`
+	Tz                  string `mapstructure:"tz"`
+	EnableAutoMigration bool   `mapstructure:"enableAutoMigration"`
 }
