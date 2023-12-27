@@ -8,10 +8,10 @@ type LogData struct {
 	StartTime       time.Time
 	TraceHeader     map[string]string
 	AdditionalData  interface{}
-	Request         HttpData
-	Response        HttpData
-	RequestBackend  HttpData
-	ResponseBackend HttpData
+	Request         *HttpData
+	Response        *HttpData
+	RequestBackend  *HttpData
+	ResponseBackend *HttpData
 
 	level        string
 	packageName  string

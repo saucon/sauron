@@ -4,7 +4,7 @@ import "github.com/saucon/sauron/v2/pkg/env/envconfig"
 
 type Config struct {
 	AppConfig         App
-	HookElasicEnabled bool          `env:"hookElasticEnabled"`
+	HookElasicEnabled bool          `mapstructure:"hookElasticEnabled"`
 	ElasticConfig     ElasticConfig `mapstructure:"elastic"`
 }
 

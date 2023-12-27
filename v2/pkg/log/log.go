@@ -17,7 +17,7 @@ var once sync.Once
 
 type LogCustom struct {
 	Logrus *logrus.Logger
-	WhoAmI logconfig.Iam
+	WhoAmI *logconfig.Iam
 	LogDb  *LogDbCustom
 
 	isDbLog bool
@@ -55,7 +55,7 @@ func NewLogCustom(configLog *logconfig.Config, isDbLog bool) *LogCustom {
 	once.Do(func() {
 		instance = &LogCustom{
 			Logrus: log,
-			WhoAmI: logconfig.Iam{
+			WhoAmI: &logconfig.Iam{
 				Name: configLog.AppConfig.Name,
 				Host: configLog.AppConfig.Host,
 				Port: configLog.AppConfig.Port,
