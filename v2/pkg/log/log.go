@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
+	"github.com/saucon/sauron/v2/pkg/external"
+	notify_error "github.com/saucon/sauron/v2/pkg/external/gspace_chat"
 	"github.com/saucon/sauron/v2/pkg/log/logconfig"
 	"github.com/saucon/sauron/v2/pkg/log/logconst"
 	"github.com/sirupsen/logrus"
@@ -20,14 +22,17 @@ type LogCustom struct {
 	WhoAmI *logconfig.Iam
 	LogDb  *LogDbCustom
 
-	isDbLog bool
+	isDbLog            bool
+	external           *external.External
+	isEnableGspaceChat bool
+	logConfig          *logconfig.Config
 }
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
-func NewLogCustom(configLog *logconfig.Config, isDbLog bool) *LogCustom {
+func NewLogCustom(configLog *logconfig.Config) *LogCustom {
 	startTime := time.Now()
 	log := logrus.New()
 
@@ -35,21 +40,7 @@ func NewLogCustom(configLog *logconfig.Config, isDbLog bool) *LogCustom {
 
 	// Hook to elastic if enabled
 	if configLog.HookElasicEnabled {
-		configElstc := configLog.ElasticConfig
-		client, err := elastic.NewClient(elastic.SetURL(
-			fmt.Sprintf("http://%v:%v", configElstc.Host, configElstc.Port)),
-			elastic.SetSniff(false),
-			elastic.SetBasicAuth(configElstc.User, configElstc.Pass))
-		if err != nil {
-			selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
-		} else {
-			hook, err := elogrus.NewAsyncElasticHook(
-				client, configElstc.Host, logrus.DebugLevel, configElstc.Index)
-			if err != nil {
-				selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
-			}
-			log.Hooks.Add(hook)
-		}
+		logElastic(configLog, startTime, log)
 	}
 
 	once.Do(func() {
@@ -60,10 +51,34 @@ func NewLogCustom(configLog *logconfig.Config, isDbLog bool) *LogCustom {
 				Host: configLog.AppConfig.Host,
 				Port: configLog.AppConfig.Port,
 			},
-			isDbLog: isDbLog,
+			isDbLog: configLog.IsDbLog,
+		}
+		if configLog.GspaceChat.IsEnabled {
+			ext := external.ProvideExternalSvc(&configLog.GspaceChat)
+			instance.isEnableGspaceChat = true
+			instance.logConfig = configLog
+			instance.external = ext
 		}
 	})
 	return instance
+}
+
+func logElastic(configLog *logconfig.Config, startTime time.Time, log *logrus.Logger) {
+	configElstc := configLog.ElasticConfig
+	client, err := elastic.NewClient(elastic.SetURL(
+		fmt.Sprintf("http://%v:%v", configElstc.Host, configElstc.Port)),
+		elastic.SetSniff(false),
+		elastic.SetBasicAuth(configElstc.User, configElstc.Pass))
+	if err != nil {
+		selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
+	} else {
+		hook, err := elogrus.NewAsyncElasticHook(
+			client, configElstc.Host, logrus.DebugLevel, configElstc.Index)
+		if err != nil {
+			selfLogError(LogData{Err: err, Description: "config/log: elastic client", StartTime: startTime}, log)
+		}
+		log.Hooks.Add(hook)
+	}
 }
 
 func (l *LogCustom) PrettyPrintJSON(isPretty bool) *LogCustom {
@@ -157,6 +172,48 @@ func (l *LogCustom) Error(data LogData) {
 
 	if l.isDbLog {
 		l.LogDb.ErrorLogDb(err, errorCause, data)
+	}
+
+	if l.isEnableGspaceChat {
+		l.sendNotifyGspaceChat(err)
+	}
+}
+
+func (l *LogCustom) sendNotifyGspaceChat(err error) {
+	errs := l.external.Gchat.SendNotif(notify_error.NotifyRequest{
+		Card: notify_error.Card{
+			CardsV2: []notify_error.CardHeader{
+				{
+					Card: notify_error.CardDetail{
+						Header: notify_error.Header{
+							Title:        "Error",
+							Subtitle:     l.logConfig.GspaceChat.ServiceName,
+							ImageUrl:     "https://developers.google.com/workspace/chat/images/quickstart-app-avatar.png",
+							ImageType:    "CIRCLE",
+							ImageAltText: "Avatar for the card header.",
+						},
+						Sections: []notify_error.Section{
+							{
+								Header:                    "Detail Error",
+								Collapsible:               true,
+								UncollapsibleWidgetsCount: 1,
+								Widgets: []notify_error.MessageWidget{
+									{
+										TextParagraph: notify_error.Message{
+											Text: fmt.Sprintf("have error : %v", err),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	if errs != nil {
+		logrus.Error(errs)
+		return
 	}
 }
 

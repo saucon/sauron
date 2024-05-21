@@ -39,3 +39,6 @@ type SampleDBConfig struct {
 	DBPostgresConfig map[string]DB `mapstructure:"dbPostgres"`
 	DBMysqlConfig    map[string]DB `mapstructure:"dbMysql"`
 }
+
+type GspaceChat struct {
+}

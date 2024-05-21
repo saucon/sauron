@@ -6,6 +6,8 @@ type Config struct {
 	AppConfig         App
 	HookElasicEnabled bool          `mapstructure:"hookElasticEnabled"`
 	ElasticConfig     ElasticConfig `mapstructure:"elastic"`
+	IsDbLog           bool
+	GspaceChat        GspaceChat `mapstructure:"gspaceChat"`
 }
 
 type ElasticConfig struct {
@@ -29,6 +31,14 @@ type App struct {
 	Version       string `mapstructure:"version"`
 	ErrorJsonPath string `mapstructure:"errorJsonPath"`
 	EnvPrefix     string `mapstructure:"envPrefix"`
+}
+
+type GspaceChat struct {
+	IsEnabled   bool   `mapstructure:"isEnabled"`
+	SpaceID     string `mapstructure:"space_id"`
+	SpaceSecret string `mapstructure:"space_secret"`
+	SpaceToken  string `mapstructure:"space_token"`
+	ServiceName string `mapstructure:"serviceName"`
 }
 
 func (c *Config) SetAppConfig(app envconfig.App) {
