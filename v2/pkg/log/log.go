@@ -175,11 +175,11 @@ func (l *LogCustom) Error(data LogData) {
 	}
 
 	if l.isEnableGspaceChat {
-		l.sendNotifyGspaceChat(err)
+		l.sendNotifyGspaceChat(err, errorCause)
 	}
 }
 
-func (l *LogCustom) sendNotifyGspaceChat(err error) {
+func (l *LogCustom) sendNotifyGspaceChat(err error, errCause string) {
 	errs := l.external.Gchat.SendNotif(notify_error.NotifyRequest{
 		Card: notify_error.Card{
 			CardsV2: []notify_error.CardHeader{
@@ -201,6 +201,11 @@ func (l *LogCustom) sendNotifyGspaceChat(err error) {
 									{
 										TextParagraph: notify_error.Message{
 											Text: fmt.Sprintf("have error : %v", err),
+										},
+									},
+									{
+										TextParagraph: notify_error.Message{
+											Text: errCause,
 										},
 									},
 								},
