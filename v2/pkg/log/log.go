@@ -26,6 +26,7 @@ type LogCustom struct {
 	external           *external.External
 	isEnableGspaceChat bool
 	logConfig          *logconfig.Config
+	logData            LogData
 }
 
 type stackTracer interface {
@@ -142,7 +143,7 @@ func (l *LogCustom) Info(data LogData) {
 	}
 }
 
-func (l *LogCustom) Error(data LogData) {
+func (l *LogCustom) Error(data LogData) *LogCustom {
 	data.level = logconst.LEVEL_ERROR
 	errorCause := ""
 	errorString := ""
@@ -173,9 +174,15 @@ func (l *LogCustom) Error(data LogData) {
 	if l.isDbLog {
 		l.LogDb.ErrorLogDb(err, errorCause, data)
 	}
+	l.logData.Err = data.Err
+	l.logData.errorCause = errorCause
 
+	return l
+}
+
+func (l *LogCustom) NotifyGspaceChat() {
 	if l.isEnableGspaceChat {
-		l.sendNotifyGspaceChat(err, errorCause)
+		l.sendNotifyGspaceChat(l.logData.Err, l.logData.errorCause)
 	}
 }
 

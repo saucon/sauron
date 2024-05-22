@@ -16,6 +16,7 @@ type LogData struct {
 	level        string
 	packageName  string
 	functionName string
+	errorCause   string
 }
 
 type HttpData struct {
