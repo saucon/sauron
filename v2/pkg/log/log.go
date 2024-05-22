@@ -193,7 +193,7 @@ func (l *LogCustom) sendNotifyGspaceChat(err error, errCause string) {
 				{
 					Card: notify_error.CardDetail{
 						Header: notify_error.Header{
-							Title:        "Error",
+							Title:        "Alert",
 							Subtitle:     l.logConfig.GspaceChat.ServiceName,
 							ImageUrl:     "https://developers.google.com/workspace/chat/images/quickstart-app-avatar.png",
 							ImageType:    "CIRCLE",
@@ -201,13 +201,13 @@ func (l *LogCustom) sendNotifyGspaceChat(err error, errCause string) {
 						},
 						Sections: []notify_error.Section{
 							{
-								Header:                    "Detail Error",
+								Header:                    "Detail Alert",
 								Collapsible:               true,
 								UncollapsibleWidgetsCount: 1,
 								Widgets: []notify_error.MessageWidget{
 									{
 										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("have error : %v", err),
+											Text: fmt.Sprintf("message : %v", err),
 										},
 									},
 									{
