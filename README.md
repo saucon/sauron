@@ -50,6 +50,26 @@ import (
 		StartTime:   timeStart,
 	})
 ```
+###### log to notify your google space chat
+###### setup you config in file env yml
+```
+configLog:
+  gspaceChat:
+    isEnabled: "true"
+    space_id: "your id google space chat"
+    space_secret: "your secret google space chat"
+    space_token: "your token google space chat"
+    serviceName: "your service name"
+```
+#### usage
+```
+	logger.Error(log.LogData{
+		Err:         errors.New("error"),
+		Description: "main success",
+		StartTime:   timeStart,
+	}).NotifyGspaceChat()
+```
+
 
 #### sample env file using format yml
 ```
