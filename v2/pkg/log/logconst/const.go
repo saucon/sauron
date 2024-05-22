@@ -1,6 +1,7 @@
 package logconst
 
-const LEVEL_SUCCESS = "success"
-const LEVEL_ERROR = "error"
-const LEVEL_INFO = "info"
-const LEVEL_FATAL = "fatal"
+const LEVEL_SUCCESS = "SUCCESS"
+const LEVEL_ERROR = "ERROR"
+const LEVEL_INFO = "INFO"
+const LEVEL_FATAL = "FATAL"
+const LEVEL_ALERT = "ALERT"

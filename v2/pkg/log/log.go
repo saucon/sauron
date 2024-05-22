@@ -174,26 +174,67 @@ func (l *LogCustom) Error(data LogData) *LogCustom {
 	if l.isDbLog {
 		l.LogDb.ErrorLogDb(err, errorCause, data)
 	}
-	l.logData.Err = data.Err
+	if data.Err == nil {
+		data.Err = errors.New(data.Message)
+	}
+	l.logData.Message = data.Err.Error()
 	l.logData.errorCause = errorCause
+	l.logData.level = data.level
+
+	return l
+}
+
+func (l *LogCustom) Alert(data LogData) *LogCustom {
+	data.level = logconst.LEVEL_ALERT
+
+	errorCause := ""
+	err := data.Err
+
+	errorCause, _ = getErrorStack(err)
+	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
+
+	data.packageName, data.functionName = getPackageAndFuncName()
+
+	l.Logrus.WithFields(logrus.Fields{
+		"whoami":                   l.WhoAmI,
+		"package_name":             data.packageName,
+		"function_name":            data.functionName,
+		"trace_header":             data.TraceHeader,
+		"level":                    data.level,
+		"additional_data":          data.AdditionalData,
+		"request":                  data.Request,
+		"response":                 data.Response,
+		"request_backend":          data.RequestBackend,
+		"response_backend":         data.ResponseBackend,
+		"elapsed_time_nanosecond":  timeNs,
+		"elapsed_time_millisecond": timeMs,
+		"elapsed_time_format":      timeFmt,
+	}).Info(data.Description)
+
+	if data.Message == "" {
+		data.Message = data.Err.Error()
+	}
+	l.logData.Message = data.Message
+	l.logData.errorCause = errorCause
+	l.logData.level = data.level
 
 	return l
 }
 
 func (l *LogCustom) NotifyGspaceChat() {
 	if l.isEnableGspaceChat {
-		l.sendNotifyGspaceChat(l.logData.Err, l.logData.errorCause)
+		l.sendNotifyGspaceChat(l.logData)
 	}
 }
 
-func (l *LogCustom) sendNotifyGspaceChat(err error, errCause string) {
+func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 	errs := l.external.Gchat.SendNotif(notify_error.NotifyRequest{
 		Card: notify_error.Card{
 			CardsV2: []notify_error.CardHeader{
 				{
 					Card: notify_error.CardDetail{
 						Header: notify_error.Header{
-							Title:        "Alert",
+							Title:        detail.level,
 							Subtitle:     l.logConfig.GspaceChat.ServiceName,
 							ImageUrl:     "https://developers.google.com/workspace/chat/images/quickstart-app-avatar.png",
 							ImageType:    "CIRCLE",
@@ -201,18 +242,18 @@ func (l *LogCustom) sendNotifyGspaceChat(err error, errCause string) {
 						},
 						Sections: []notify_error.Section{
 							{
-								Header:                    "Detail Alert",
+								Header:                    detail.level,
 								Collapsible:               true,
 								UncollapsibleWidgetsCount: 1,
 								Widgets: []notify_error.MessageWidget{
 									{
 										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("message : %v", err),
+											Text: fmt.Sprintf("message : %v", l.logData.Message),
 										},
 									},
 									{
 										TextParagraph: notify_error.Message{
-											Text: errCause,
+											Text: l.logData.errorCause,
 										},
 									},
 								},

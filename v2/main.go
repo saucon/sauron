@@ -30,4 +30,10 @@ func main() {
 		StartTime:   timeStart,
 	})
 
+	logger.Alert(log.LogData{
+		Message:     "ini alert ya",
+		Description: "alert pokoknya",
+		StartTime:   timeStart,
+	})
+
 }
