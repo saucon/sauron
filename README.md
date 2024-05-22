@@ -66,13 +66,7 @@ configLog:
     serviceName: "your service name"
 ```
 #### usage
-```
-	logger.Error(log.LogData{
-		Err:         errors.New("error"),
-		Description: "main success",
-		StartTime:   timeStart,
-	}).NotifyGspaceChat()
-```
+![image](https://github.com/saucon/sauron/assets/168184421/864bb24c-73b5-405c-9581-ccb7cd740a2a)
 
 
 #### sample env file using format yml
