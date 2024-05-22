@@ -51,9 +51,9 @@ import (
 	})
 ```
 ###### Log To Notify Your Google Space Chat
-```
-document about webhook google space chat https://developers.google.com/workspace/chat/quickstart/webhooks?hl=id
-```
+
+document about webhook [google space chat](https://developers.google.com/workspace/chat/quickstart/webhooks?hl=id) 
+
 inject struct config_log in your config struct
 ```
 ConfigLog logconfig.Config `mapstructure:"configLog"`
