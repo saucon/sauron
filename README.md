@@ -50,7 +50,11 @@ import (
 		StartTime:   timeStart,
 	})
 ```
-###### log to notify your google space chat
+###### Log To Notify Your Google Space Chat
+inject struct config_log in your config struct
+```
+ConfigLog logconfig.Config `mapstructure:"configLog"`
+```
 ###### setup you config in file env yml
 ```
 configLog:
