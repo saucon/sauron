@@ -256,6 +256,11 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 											Text: l.logData.errorCause,
 										},
 									},
+									{
+										TextParagraph: notify_error.Message{
+											Text: fmt.Sprintf("description : %v", l.logData.Description),
+										},
+									},
 								},
 							},
 						},
