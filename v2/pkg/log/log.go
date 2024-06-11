@@ -217,6 +217,7 @@ func (l *LogCustom) Alert(data LogData) *LogCustom {
 	l.logData.Message = data.Message
 	l.logData.errorCause = errorCause
 	l.logData.level = data.level
+	l.logData.Description = data.Description
 
 	return l
 }
