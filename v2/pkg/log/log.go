@@ -237,7 +237,7 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 						Header: notify_error.Header{
 							Title:        detail.level,
 							Subtitle:     l.logConfig.GspaceChat.ServiceName,
-							ImageUrl:     "https://developers.google.com/workspace/chat/images/quickstart-app-avatar.png",
+							ImageUrl:     "https://storage.googleapis.com/brc_public_assets/alert.png",
 							ImageType:    "CIRCLE",
 							ImageAltText: "Avatar for the card header.",
 						},
