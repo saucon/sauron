@@ -50,14 +50,8 @@ import (
 		StartTime:   timeStart,
 	})
 ```
-###### Log To Notify Your Google Space Chat
 
-document about webhook [google space chat](https://developers.google.com/workspace/chat/quickstart/webhooks?hl=id) 
-
-inject struct config_log in your config struct
-```
-ConfigLog logconfig.Config `mapstructure:"configLog"`
-```
+###### log to notify your google space chat
 ###### setup you config in file env yml
 ```
 configLog:
@@ -69,8 +63,13 @@ configLog:
     serviceName: "your service name"
 ```
 #### usage
-![image](https://github.com/saucon/sauron/assets/168184421/864bb24c-73b5-405c-9581-ccb7cd740a2a)
-
+```
+	logger.Error(log.LogData{
+		Err:         errors.New("error"),
+		Description: "main success",
+		StartTime:   timeStart,
+	}).NotifyGspaceChat()
+```
 
 #### sample env file using format yml
 ```

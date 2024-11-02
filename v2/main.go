@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/saucon/sauron/v2/pkg/log"
 	"github.com/saucon/sauron/v2/pkg/log/logconfig"
 	"time"
@@ -9,14 +10,25 @@ import (
 func main() {
 	timeStart := time.Now()
 
-	logger := log.NewLogCustom(&logconfig.Config{}, false)
-	logger.PrettyPrintJSON(false)
+	logger := log.NewLogCustom(&logconfig.Config{
+		HookElasicEnabled: false,
+		ElasticConfig:     logconfig.ElasticConfig{},
+		IsDbLog:           false,
+	})
+	logger.PrettyPrintJSON(true)
 
-	logger.Success(log.LogData{
+	logger.Error(log.LogData{
+		Err:         errors.New("error"),
 		Description: "main success",
 		StartTime:   timeStart,
 	})
 
+	logger.Alert(log.LogData{
+		Message:     "ini alert ya",
+		Description: "alert pokoknya",
+		StartTime:   timeStart,
+	})
+  
 	logger.Info(log.LogData{
 		Description: "main info",
 		StartTime:   timeStart,
@@ -31,4 +43,5 @@ func main() {
 		Description: "main fatal",
 		StartTime:   timeStart,
 	})
+  
 }

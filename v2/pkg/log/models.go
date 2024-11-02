@@ -4,6 +4,7 @@ import "time"
 
 type LogData struct {
 	Err             error
+	Message         string
 	Description     string
 	StartTime       time.Time
 	TraceHeader     map[string]string
@@ -16,6 +17,7 @@ type LogData struct {
 	level        string
 	packageName  string
 	functionName string
+	errorCause   string
 }
 
 type HttpData struct {

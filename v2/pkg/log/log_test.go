@@ -10,7 +10,7 @@ import (
 )
 
 func BenchmarkFunction(b *testing.B) {
-	logger := log.NewLogCustom(&logconfig.Config{}, false).PrettyPrintJSON(false)
+	logger := log.NewLogCustom(&logconfig.Config{}).PrettyPrintJSON(false)
 	err := errors.New("Error Baru nih")
 	timeStart := time.Now()
 
