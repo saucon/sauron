@@ -50,6 +50,7 @@ import (
 		StartTime:   timeStart,
 	})
 ```
+
 ###### log to notify your google space chat
 ###### setup you config in file env yml
 ```
@@ -69,7 +70,6 @@ configLog:
 		StartTime:   timeStart,
 	}).NotifyGspaceChat()
 ```
-
 
 #### sample env file using format yml
 ```

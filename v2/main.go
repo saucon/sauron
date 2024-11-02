@@ -14,13 +14,6 @@ func main() {
 		HookElasicEnabled: false,
 		ElasticConfig:     logconfig.ElasticConfig{},
 		IsDbLog:           false,
-		GspaceChat: logconfig.GspaceChat{
-			IsEnabled:   true,
-			SpaceID:     "AAAA2Ac_U5k",
-			SpaceSecret: "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI",
-			SpaceToken:  "HWeSlbhdWGwWUGMnqCqPSEuoS1p7p7JicUouDRs59n0",
-			ServiceName: "ms-brc-bayarin",
-		},
 	})
 	logger.PrettyPrintJSON(true)
 
@@ -35,5 +28,20 @@ func main() {
 		Description: "alert pokoknya",
 		StartTime:   timeStart,
 	})
+  
+	logger.Info(log.LogData{
+		Description: "main info",
+		StartTime:   timeStart,
+	})
 
+	logger.Error(log.LogData{
+		Description: "main error",
+		StartTime:   timeStart,
+	})
+
+	logger.Fatal(log.LogData{
+		Description: "main fatal",
+		StartTime:   timeStart,
+	})
+  
 }

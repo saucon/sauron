@@ -95,6 +95,7 @@ func (l *LogCustom) Success(data LogData) {
 	data.packageName, data.functionName = getPackageAndFuncName()
 
 	l.Logrus.WithFields(logrus.Fields{
+		"severity":                 "INFO",
 		"whoami":                   l.WhoAmI,
 		"package_name":             data.packageName,
 		"function_name":            data.functionName,
@@ -123,6 +124,7 @@ func (l *LogCustom) Info(data LogData) {
 	data.packageName, data.functionName = getPackageAndFuncName()
 
 	l.Logrus.WithFields(logrus.Fields{
+		"severity":                 "INFO",
 		"whoami":                   l.WhoAmI,
 		"package_name":             data.packageName,
 		"function_name":            data.functionName,
@@ -154,6 +156,7 @@ func (l *LogCustom) Error(data LogData) *LogCustom {
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
 	l.Logrus.WithFields(logrus.Fields{
+		"severity":                 "ERROR",
 		"whoami":                   l.WhoAmI,
 		"error_cause":              errorCause,
 		"error_message":            errorString,
@@ -287,6 +290,7 @@ func (l *LogCustom) Fatal(data LogData) {
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
 	l.Logrus.WithFields(logrus.Fields{
+		"severity":                 "CRITICAL",
 		"whoami":                   l.WhoAmI,
 		"error_cause":              errorCause,
 		"error_message":            errorString,
@@ -320,6 +324,7 @@ func selfLogError(data LogData, log *logrus.Logger) {
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
 	log.WithFields(logrus.Fields{
+		"severity":                 "ERROR",
 		"error_cause":              errorCause,
 		"error_message":            errorString,
 		"package_name":             data.packageName,
@@ -342,6 +347,7 @@ func selfLogFatal(data LogData, log *logrus.Logger) {
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
 	log.WithFields(logrus.Fields{
+		"severity":                 "CRITICAL",
 		"error_cause":              errorCause,
 		"error_message":            errorString,
 		"package_name":             data.packageName,
