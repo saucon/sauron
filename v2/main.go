@@ -10,11 +10,25 @@ func main() {
 	timeStart := time.Now()
 
 	logger := log.NewLogCustom(&logconfig.Config{}, false)
-	logger.PrettyPrintJSON(true)
+	logger.PrettyPrintJSON(false)
 
 	logger.Success(log.LogData{
 		Description: "main success",
 		StartTime:   timeStart,
 	})
 
+	logger.Info(log.LogData{
+		Description: "main info",
+		StartTime:   timeStart,
+	})
+
+	logger.Error(log.LogData{
+		Description: "main error",
+		StartTime:   timeStart,
+	})
+
+	logger.Fatal(log.LogData{
+		Description: "main fatal",
+		StartTime:   timeStart,
+	})
 }
