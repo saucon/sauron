@@ -8,6 +8,9 @@ type Config struct {
 	ElasticConfig     ElasticConfig `mapstructure:"elastic"`
 	IsDbLog           bool
 	GspaceChat        GspaceChat `mapstructure:"gspaceChat"`
+
+	// it will disable elastic and db log
+	DisableJsonFormat bool `mapstructure:"disableJsonFormat"`
 }
 
 type ElasticConfig struct {

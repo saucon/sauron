@@ -24,7 +24,7 @@ func New(filenames string, config ...any) (ev EnvConfig, err error) {
 			logrus.WithFields(logrus.Fields{
 				"error_cause":   PrintErrorStack(err),
 				"error_message": err.Error(),
-			}).Fatal("config/env: load briapiconfig")
+			}).Fatal("config/env: load")
 		}
 	}
 

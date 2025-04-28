@@ -37,7 +37,14 @@ func NewLogCustom(configLog *logconfig.Config) *LogCustom {
 	startTime := time.Now()
 	log := logrus.New()
 
-	log.SetFormatter(&logrus.JSONFormatter{PrettyPrint: false})
+	// default is false
+	if configLog.DisableJsonFormat {
+		configLog.IsDbLog = false
+		configLog.HookElasicEnabled = false
+		log.SetFormatter(&logrus.TextFormatter{})
+	} else {
+		log.SetFormatter(&logrus.JSONFormatter{PrettyPrint: false})
+	}
 
 	// Hook to elastic if enabled
 	if configLog.HookElasicEnabled {
@@ -52,7 +59,8 @@ func NewLogCustom(configLog *logconfig.Config) *LogCustom {
 				Host: configLog.AppConfig.Host,
 				Port: configLog.AppConfig.Port,
 			},
-			isDbLog: configLog.IsDbLog,
+			isDbLog:   configLog.IsDbLog,
+			logConfig: configLog,
 		}
 		if configLog.GspaceChat.IsEnabled {
 			ext := external.ProvideExternalSvc(&configLog.GspaceChat)
@@ -82,8 +90,26 @@ func logElastic(configLog *logconfig.Config, startTime time.Time, log *logrus.Lo
 	}
 }
 
+func (l *LogCustom) SetLogConfig(config *logconfig.Config) {
+	// default is false
+	if config.DisableJsonFormat {
+		config.IsDbLog = false
+		config.HookElasicEnabled = false
+		l.Logrus.SetFormatter(&logrus.TextFormatter{})
+	} else {
+		l.Logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: false})
+	}
+
+	if config.GspaceChat.IsEnabled {
+		ext := external.ProvideExternalSvc(&config.GspaceChat)
+		l.isEnableGspaceChat = true
+		l.external = ext
+	}
+}
 func (l *LogCustom) PrettyPrintJSON(isPretty bool) *LogCustom {
-	l.Logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: isPretty})
+	if !l.logConfig.DisableJsonFormat {
+		l.Logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: isPretty})
+	}
 	return l
 }
 
@@ -240,7 +266,7 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 						Header: notify_error.Header{
 							Title:        detail.level,
 							Subtitle:     l.logConfig.GspaceChat.ServiceName,
-							ImageUrl:     "https://storage.googleapis.com/brc_public_assets/alert.png",
+							ImageUrl:     "https://storage.googleapis.com/public_asset_01967ae8-4ffc-734e-b6e5-b715d4f60634/alert.png",
 							ImageType:    "CIRCLE",
 							ImageAltText: "Avatar for the card header.",
 						},
