@@ -4,8 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/saucon/sauron/v2/pkg/env"
-	"github.com/saucon/sauron/v2/pkg/secure"
+	"github.com/saucon/sauron/v2/envsecure/pkg/env"
+	"github.com/saucon/sauron/v2/envsecure/pkg/secure"
 	"github.com/spf13/cobra"
 	"os"
 	"strings"

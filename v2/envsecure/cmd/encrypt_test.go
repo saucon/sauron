@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/saucon/sauron/v2/pkg/env"
-	"github.com/saucon/sauron/v2/pkg/secure"
-	"github.com/saucon/sauron/v2/sample"
+	"github.com/saucon/sauron/v2/envsecure/pkg/env"
+	"github.com/saucon/sauron/v2/envsecure/pkg/secure"
+	"github.com/saucon/sauron/v2/envsecure/sample"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -20,8 +20,8 @@ func TestRootCmdWithEncrypt(t *testing.T) {
 	// Set up the arguments for the root command
 	rootCmd.SetArgs([]string{
 		"encrypt",
-		"--file", "../../sample/env.sample.yml",
-		"--keyfile", "../../sample/public_key.pem",
+		"--file", "../sample/env.sample.yml",
+		"--keyfile", "../sample/public_key.pem",
 		"--algo", "rsa",
 	})
 
@@ -38,11 +38,11 @@ func TestRootCmdWithEncrypt(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Assert the output contains the expected message
-	assert.Contains(t, output.String(), "Config encrypted and saved successfully!")
+	assert.Contains(t, output.String(), "Config encrypted and saved successfully")
 
 	// try decrypt the config
 	secureRsa := secure.NewSecureRSA()
-	privSec, err := secure.ReadKeyFromFile("../../sample/private_key.pem")
+	privSec, err := secure.ReadKeyFromFile("../sample/private_key.pem")
 
 	assert.NoError(t, err)
 
@@ -52,7 +52,7 @@ func TestRootCmdWithEncrypt(t *testing.T) {
 	assert.NoError(t, err)
 
 	var cfg sample.ConfigSample
-	data, err := os.ReadFile("../../sample/env.sample.yml")
+	data, err := os.ReadFile("../sample/env.sample.yml")
 
 	assert.NoError(t, err)
 
