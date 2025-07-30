@@ -92,9 +92,9 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 		}
 
 		//Database Connection Pool
-		dbSQL.SetMaxIdleConns(10)
-		dbSQL.SetMaxOpenConns(100)
-		dbSQL.SetConnMaxLifetime(time.Hour)
+		dbSQL.SetMaxIdleConns(conf.DBPostgresConfig[dbCfg].SetMaxIdleConns)
+		dbSQL.SetMaxOpenConns(conf.DBPostgresConfig[dbCfg].SetMaxOpenConns)
+		dbSQL.SetConnMaxLifetime(conf.DBPostgresConfig[dbCfg].SetConnMaxLifetime)
 
 		err = dbSQL.Ping()
 		if err != nil {
@@ -162,9 +162,9 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 		}
 
 		//Database Connection Pool
-		dbSQL.SetMaxIdleConns(10)
-		dbSQL.SetMaxOpenConns(100)
-		dbSQL.SetConnMaxLifetime(time.Hour)
+		dbSQL.SetMaxIdleConns(conf.DBMysqlConfig[dbCfg].SetMaxIdleConns)
+		dbSQL.SetMaxOpenConns(conf.DBMysqlConfig[dbCfg].SetMaxOpenConns)
+		dbSQL.SetConnMaxLifetime(conf.DBMysqlConfig[dbCfg].SetConnMaxLifetime)
 
 		err = dbSQL.Ping()
 		if err != nil {
