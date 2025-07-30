@@ -95,6 +95,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 		dbSQL.SetMaxIdleConns(conf.DBPostgresConfig[dbCfg].SetMaxIdleConns)
 		dbSQL.SetMaxOpenConns(conf.DBPostgresConfig[dbCfg].SetMaxOpenConns)
 		dbSQL.SetConnMaxLifetime(conf.DBPostgresConfig[dbCfg].SetConnMaxLifetime)
+		dbSQL.SetConnMaxIdleTime(conf.DBPostgresConfig[dbCfg].SetConnMaxIdleTime)
 
 		err = dbSQL.Ping()
 		if err != nil {
@@ -165,6 +166,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 		dbSQL.SetMaxIdleConns(conf.DBMysqlConfig[dbCfg].SetMaxIdleConns)
 		dbSQL.SetMaxOpenConns(conf.DBMysqlConfig[dbCfg].SetMaxOpenConns)
 		dbSQL.SetConnMaxLifetime(conf.DBMysqlConfig[dbCfg].SetConnMaxLifetime)
+		dbSQL.SetConnMaxIdleTime(conf.DBMysqlConfig[dbCfg].SetConnMaxIdleTime)
 
 		err = dbSQL.Ping()
 		if err != nil {
