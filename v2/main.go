@@ -10,12 +10,6 @@ import (
 func main() {
 	timeStart := time.Now()
 
-	/*
-	   space_id: "AAQA_DZGCcI"
-	   space_secret: "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
-	   space_token: "7lnkKiQXJ76kVqofLBUG8PJeMFKQEgT3WBsYzGbw6tM"
-	   serviceName: "alert-temporary-brifast"
-	*/
 	logger := log.NewLogCustom(&logconfig.Config{
 		HookElasicEnabled: false,
 		ElasticConfig:     logconfig.ElasticConfig{},
@@ -23,9 +17,9 @@ func main() {
 		GspaceChat: logconfig.GspaceChat{
 			IsEnabled:   true,
 			SpaceID:     "AAAA5Nnc5Og",
-			SpaceSecret: "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI",
-			SpaceToken:  "7lnkKiQXJ76kVqofLBUG8PJeMFKQEgT3WBsYzGbw6tM",
-			ServiceName: "recon-sevel-dev",
+			SpaceSecret: "xxxxxx-WEfRq3CPzqKqqsHI",
+			SpaceToken:  "zzzzzzzzz",
+			ServiceName: "sevel-dev",
 		},
 	})
 	logger.PrettyPrintJSON(true)
@@ -41,7 +35,7 @@ func main() {
 		Message:     "ini alert ya",
 		Description: "alert pokoknya",
 		StartTime:   timeStart,
-		DetailUrl:   "https://ui-dashboard-internal-156711525829.asia-east2.run.app/setor-hkd/537",
+		DetailUrl:   "https://ui-dashboard-internal/537",
 		ButtonText:  "Go to Detail",
 	}).NotifyGspaceChat()
 
