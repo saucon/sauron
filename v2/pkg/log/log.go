@@ -141,6 +141,11 @@ func (l *LogCustom) Info(data LogData) {
 	if l.isDbLog {
 		l.LogDb.SuccessLogDb(data)
 	}
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.Message = data.Message
+	l.logData.level = data.level
+	l.logData.Description = data.Description
+	l.logData.ButtonText = data.ButtonText
 }
 
 func (l *LogCustom) Error(data LogData) *LogCustom {
@@ -177,6 +182,8 @@ func (l *LogCustom) Error(data LogData) *LogCustom {
 	if data.Err == nil {
 		data.Err = errors.New(data.Message)
 	}
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.ButtonText = data.ButtonText
 	l.logData.Message = data.Err.Error()
 	l.logData.errorCause = errorCause
 	l.logData.level = data.level
@@ -218,6 +225,8 @@ func (l *LogCustom) Alert(data LogData) *LogCustom {
 	l.logData.errorCause = errorCause
 	l.logData.level = data.level
 	l.logData.Description = data.Description
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.ButtonText = data.ButtonText
 
 	return l
 }
@@ -229,6 +238,15 @@ func (l *LogCustom) NotifyGspaceChat() {
 }
 
 func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
+	btns := []notify_error.Button{
+		{
+			Text: detail.ButtonText,
+			OnClick: notify_error.OnClick{
+				OpenLink: notify_error.OpenLink{URL: detail.DetailUrl},
+			},
+		},
+	}
+
 	errs := l.external.Gchat.SendNotif(notify_error.NotifyRequest{
 		Card: notify_error.Card{
 			CardsV2: []notify_error.CardHeader{
@@ -248,19 +266,16 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 								UncollapsibleWidgetsCount: 1,
 								Widgets: []notify_error.MessageWidget{
 									{
-										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("message : %v", l.logData.Message),
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("message : %v", l.logData.Message)),
 									},
 									{
-										TextParagraph: notify_error.Message{
-											Text: l.logData.errorCause,
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("error cause : %v", l.logData.errorCause)),
 									},
 									{
-										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("description : %v", l.logData.Description),
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("description : %v", l.logData.Description)),
+									},
+									{
+										ButtonList: notify_error.BuildButtons(btns),
 									},
 								},
 							},
