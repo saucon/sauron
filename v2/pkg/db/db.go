@@ -123,7 +123,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 		name = conf.DBMysqlConfig[dbCfg].Name
 		tz = conf.DBMysqlConfig[dbCfg].Tz
 
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=%s", user, password, host, port, name, tz)
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=%s", user, password, host, port, name, tz)
 
 		// open connection
 		DB, err = gorm.Open(mysql.Open(dsn))
@@ -136,7 +136,7 @@ func NewDB(conf *dbconfig.Config, logger *log.LogCustom, dbCfg string, dbCfgRepl
 
 		// create dsn replica if exist
 		if db, ok := conf.DBMysqlConfig[dbCfgReplica]; ok {
-			dsnReplica = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=%s", db.User, db.Pass, db.Host, db.Port, db.Name, db.Tz)
+			dsnReplica = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=%s", db.User, db.Pass, db.Host, db.Port, db.Name, db.Tz)
 		}
 
 		// create dbresolver if using replica
