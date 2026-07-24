@@ -6,6 +6,8 @@ type LogData struct {
 	Err             error
 	Message         string
 	Description     string
+	DetailUrl       string
+	ButtonText      string
 	StartTime       time.Time
 	TraceHeader     map[string]string
 	AdditionalData  interface{}

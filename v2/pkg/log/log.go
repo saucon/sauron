@@ -2,6 +2,9 @@ package log
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/saucon/sauron/v2/pkg/external"
@@ -10,8 +13,6 @@ import (
 	"github.com/saucon/sauron/v2/pkg/log/logconst"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sohlich/elogrus.v7"
-	"sync"
-	"time"
 )
 
 var instance *LogCustom
@@ -107,9 +108,7 @@ func (l *LogCustom) SetLogConfig(config *logconfig.Config) {
 	}
 }
 func (l *LogCustom) PrettyPrintJSON(isPretty bool) *LogCustom {
-	if !l.logConfig.DisableJsonFormat {
-		l.Logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: isPretty})
-	}
+	l.Logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: isPretty})
 	return l
 }
 
@@ -169,6 +168,11 @@ func (l *LogCustom) Info(data LogData) {
 	if l.isDbLog {
 		l.LogDb.SuccessLogDb(data)
 	}
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.Message = data.Message
+	l.logData.level = data.level
+	l.logData.Description = data.Description
+	l.logData.ButtonText = data.ButtonText
 }
 
 func (l *LogCustom) Error(data LogData) *LogCustom {
@@ -206,6 +210,8 @@ func (l *LogCustom) Error(data LogData) *LogCustom {
 	if data.Err == nil {
 		data.Err = errors.New(data.Message)
 	}
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.ButtonText = data.ButtonText
 	l.logData.Message = data.Err.Error()
 	l.logData.errorCause = errorCause
 	l.logData.level = data.level
@@ -247,6 +253,8 @@ func (l *LogCustom) Alert(data LogData) *LogCustom {
 	l.logData.errorCause = errorCause
 	l.logData.level = data.level
 	l.logData.Description = data.Description
+	l.logData.DetailUrl = data.DetailUrl
+	l.logData.ButtonText = data.ButtonText
 
 	return l
 }
@@ -258,6 +266,15 @@ func (l *LogCustom) NotifyGspaceChat() {
 }
 
 func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
+	btns := []notify_error.Button{
+		{
+			Text: detail.ButtonText,
+			OnClick: notify_error.OnClick{
+				OpenLink: notify_error.OpenLink{URL: detail.DetailUrl},
+			},
+		},
+	}
+
 	errs := l.external.Gchat.SendNotif(notify_error.NotifyRequest{
 		Card: notify_error.Card{
 			CardsV2: []notify_error.CardHeader{
@@ -266,7 +283,7 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 						Header: notify_error.Header{
 							Title:        detail.level,
 							Subtitle:     l.logConfig.GspaceChat.ServiceName,
-							ImageUrl:     "https://storage.googleapis.com/public_asset_01967ae8-4ffc-734e-b6e5-b715d4f60634/alert.png",
+							ImageUrl:     "https://storage.googleapis.com/brc_public_assets/alert.png",
 							ImageType:    "CIRCLE",
 							ImageAltText: "Avatar for the card header.",
 						},
@@ -277,19 +294,16 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 								UncollapsibleWidgetsCount: 1,
 								Widgets: []notify_error.MessageWidget{
 									{
-										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("message : %v", l.logData.Message),
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("message : %v", l.logData.Message)),
 									},
 									{
-										TextParagraph: notify_error.Message{
-											Text: l.logData.errorCause,
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("error cause : %v", l.logData.errorCause)),
 									},
 									{
-										TextParagraph: notify_error.Message{
-											Text: fmt.Sprintf("description : %v", l.logData.Description),
-										},
+										TextParagraph: notify_error.BuildMessage(fmt.Sprintf("description : %v", l.logData.Description)),
+									},
+									{
+										ButtonList: notify_error.BuildButtons(btns),
 									},
 								},
 							},
