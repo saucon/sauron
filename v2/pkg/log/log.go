@@ -1,6 +1,7 @@
 package log
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -141,14 +142,28 @@ func (l *LogCustom) Success(data LogData) {
 	}
 }
 
+// Every public log method resolves the caller's package/function name itself
+// (getPackageAndFuncName uses a fixed runtime.Caller depth) and then delegates
+// to the unexported implementation, so the plain and *Ctx variants report the
+// same caller.
+
 func (l *LogCustom) Info(data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	l.logInfo(data, nil)
+}
+
+// InfoCtx is Info plus the trace/span IDs of the active span in ctx.
+func (l *LogCustom) InfoCtx(ctx context.Context, data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	l.logInfo(withTrace(ctx, data))
+}
+
+func (l *LogCustom) logInfo(data LogData, traceFields logrus.Fields) {
 	data.level = logconst.LEVEL_INFO
 
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
-	data.packageName, data.functionName = getPackageAndFuncName()
-
-	l.Logrus.WithFields(logrus.Fields{
+	l.Logrus.WithFields(traceFields).WithFields(logrus.Fields{
 		"severity":                 "INFO",
 		"whoami":                   l.WhoAmI,
 		"package_name":             data.packageName,
@@ -176,16 +191,30 @@ func (l *LogCustom) Info(data LogData) {
 }
 
 func (l *LogCustom) Error(data LogData) *LogCustom {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err) // fixed stack depth, like above
+	return l.logError(data, nil)
+}
+
+// ErrorCtx is Error plus the trace/span IDs of the active span in ctx.
+func (l *LogCustom) ErrorCtx(ctx context.Context, data LogData) *LogCustom {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err)
+	return l.logError(withTrace(ctx, data))
+}
+
+func (l *LogCustom) logError(data LogData, traceFields logrus.Fields) *LogCustom {
 	data.level = logconst.LEVEL_ERROR
-	errorCause := ""
+	errorCause := data.errorCause
 	errorString := ""
 	err := data.Err
+	if err != nil {
+		errorString = err.Error()
+	}
 
-	data.packageName, data.functionName = getPackageAndFuncName()
-	errorCause, errorString = getErrorStack(err)
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
-	l.Logrus.WithFields(logrus.Fields{
+	l.Logrus.WithFields(traceFields).WithFields(logrus.Fields{
 		"severity":                 "ERROR",
 		"whoami":                   l.WhoAmI,
 		"error_cause":              errorCause,
@@ -220,17 +249,26 @@ func (l *LogCustom) Error(data LogData) *LogCustom {
 }
 
 func (l *LogCustom) Alert(data LogData) *LogCustom {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err)
+	return l.logAlert(data, nil)
+}
+
+// AlertCtx is Alert plus the trace/span IDs of the active span in ctx.
+func (l *LogCustom) AlertCtx(ctx context.Context, data LogData) *LogCustom {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err)
+	return l.logAlert(withTrace(ctx, data))
+}
+
+func (l *LogCustom) logAlert(data LogData, traceFields logrus.Fields) *LogCustom {
 	data.level = logconst.LEVEL_ALERT
 
-	errorCause := ""
-	err := data.Err
+	errorCause := data.errorCause
 
-	errorCause, _ = getErrorStack(err)
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
-	data.packageName, data.functionName = getPackageAndFuncName()
-
-	l.Logrus.WithFields(logrus.Fields{
+	l.Logrus.WithFields(traceFields).WithFields(logrus.Fields{
 		"whoami":                   l.WhoAmI,
 		"package_name":             data.packageName,
 		"function_name":            data.functionName,
