@@ -18,6 +18,7 @@ func newTestLogger(buf *bytes.Buffer) *LogCustom {
 	lg := logrus.New()
 	lg.SetFormatter(&logrus.JSONFormatter{})
 	lg.SetOutput(buf)
+	lg.ExitFunc = func(int) {} // let Fatal/FatalCtx return in tests
 	return &LogCustom{Logrus: lg, WhoAmI: &logconfig.Iam{}}
 }
 
@@ -56,8 +57,15 @@ func TestCtxMethods_AddTraceFieldsAndKeepCaller(t *testing.T) {
 	errEntry := lastEntry(t, &buf)
 	l.AlertCtx(ctx, data)
 	alert := lastEntry(t, &buf)
+	l.SuccessCtx(ctx, data)
+	success := lastEntry(t, &buf)
+	l.FatalCtx(ctx, data)
+	fatal := lastEntry(t, &buf)
 
-	for name, m := range map[string]map[string]any{"InfoCtx": info, "ErrorCtx": errEntry, "AlertCtx": alert} {
+	entries := map[string]map[string]any{
+		"InfoCtx": info, "ErrorCtx": errEntry, "AlertCtx": alert, "SuccessCtx": success, "FatalCtx": fatal,
+	}
+	for name, m := range entries {
 		if m["trace_id"] != sc.TraceID().String() || m["span_id"] != sc.SpanID().String() {
 			t.Errorf("%s: trace_id/span_id = %v/%v", name, m["trace_id"], m["span_id"])
 		}
@@ -73,7 +81,7 @@ func TestCtxMethods_AddTraceFieldsAndKeepCaller(t *testing.T) {
 		if m["function_name"] != "TestCtxMethods_AddTraceFieldsAndKeepCaller" {
 			t.Errorf("%s: function_name = %v", name, m["function_name"])
 		}
-		if name == "ErrorCtx" && !strings.Contains(fmt.Sprint(m["error_cause"]), "TestCtxMethods_AddTraceFieldsAndKeepCaller") {
+		if (name == "ErrorCtx" || name == "FatalCtx") && !strings.Contains(fmt.Sprint(m["error_cause"]), "TestCtxMethods_AddTraceFieldsAndKeepCaller") {
 			t.Errorf("%s: error_cause = %v", name, m["error_cause"])
 		}
 	}
@@ -90,8 +98,15 @@ func TestPlainMethods_Unchanged(t *testing.T) {
 	errEntry := lastEntry(t, &buf)
 	l.Alert(data)
 	alert := lastEntry(t, &buf)
+	l.Success(data)
+	success := lastEntry(t, &buf)
+	l.Fatal(data)
+	fatal := lastEntry(t, &buf)
 
-	for name, m := range map[string]map[string]any{"Info": info, "Error": errEntry, "Alert": alert} {
+	entries := map[string]map[string]any{
+		"Info": info, "Error": errEntry, "Alert": alert, "Success": success, "Fatal": fatal,
+	}
+	for name, m := range entries {
 		for _, k := range []string{"trace_id", "span_id", "logging.googleapis.com/trace", "logging.googleapis.com/spanId"} {
 			if _, ok := m[k]; ok {
 				t.Errorf("%s: unexpected field %s", name, k)
@@ -103,7 +118,7 @@ func TestPlainMethods_Unchanged(t *testing.T) {
 		if m["function_name"] != "TestPlainMethods_Unchanged" {
 			t.Errorf("%s: function_name = %v", name, m["function_name"])
 		}
-		if name == "Error" && !strings.Contains(fmt.Sprint(m["error_cause"]), "TestPlainMethods_Unchanged") {
+		if (name == "Error" || name == "Fatal") && !strings.Contains(fmt.Sprint(m["error_cause"]), "TestPlainMethods_Unchanged") {
 			t.Errorf("%s: error_cause = %v", name, m["error_cause"])
 		}
 	}

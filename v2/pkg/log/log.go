@@ -113,14 +113,28 @@ func (l *LogCustom) PrettyPrintJSON(isPretty bool) *LogCustom {
 	return l
 }
 
+// Every public log method resolves the caller's package/function name (and
+// error_cause) itself, because getPackageAndFuncName and getErrorStack use a
+// fixed runtime stack depth, and then delegates to the unexported
+// implementation, so the plain and *Ctx variants report the same caller.
+
 func (l *LogCustom) Success(data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	l.logSuccess(data, nil)
+}
+
+// SuccessCtx is Success plus the trace/span IDs of the active span in ctx.
+func (l *LogCustom) SuccessCtx(ctx context.Context, data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	l.logSuccess(withTrace(ctx, data))
+}
+
+func (l *LogCustom) logSuccess(data LogData, traceFields logrus.Fields) {
 	data.level = logconst.LEVEL_SUCCESS
 
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
-	data.packageName, data.functionName = getPackageAndFuncName()
-
-	l.Logrus.WithFields(logrus.Fields{
+	l.Logrus.WithFields(traceFields).WithFields(logrus.Fields{
 		"severity":                 "INFO",
 		"whoami":                   l.WhoAmI,
 		"package_name":             data.packageName,
@@ -141,11 +155,6 @@ func (l *LogCustom) Success(data LogData) {
 		l.LogDb.SuccessLogDb(data)
 	}
 }
-
-// Every public log method resolves the caller's package/function name itself
-// (getPackageAndFuncName uses a fixed runtime.Caller depth) and then delegates
-// to the unexported implementation, so the plain and *Ctx variants report the
-// same caller.
 
 func (l *LogCustom) Info(data LogData) {
 	data.packageName, data.functionName = getPackageAndFuncName()
@@ -358,16 +367,31 @@ func (l *LogCustom) sendNotifyGspaceChat(detail LogData) {
 }
 
 func (l *LogCustom) Fatal(data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err)
+	l.logFatal(data, nil)
+}
+
+// FatalCtx is Fatal plus the trace/span IDs of the active span in ctx. Like
+// Fatal it exits the process, so buffered OTel spans are not flushed.
+func (l *LogCustom) FatalCtx(ctx context.Context, data LogData) {
+	data.packageName, data.functionName = getPackageAndFuncName()
+	data.errorCause, _ = getErrorStack(data.Err)
+	l.logFatal(withTrace(ctx, data))
+}
+
+func (l *LogCustom) logFatal(data LogData, traceFields logrus.Fields) {
 	data.level = logconst.LEVEL_FATAL
-	errorCause := ""
+	errorCause := data.errorCause
 	errorString := ""
 	err := data.Err
+	if err != nil {
+		errorString = err.Error()
+	}
 
-	data.packageName, data.functionName = getPackageAndFuncName()
-	errorCause, errorString = getErrorStack(err)
 	timeNs, timeMs, timeFmt := responseTimeString(data.StartTime)
 
-	l.Logrus.WithFields(logrus.Fields{
+	l.Logrus.WithFields(traceFields).WithFields(logrus.Fields{
 		"severity":                 "CRITICAL",
 		"whoami":                   l.WhoAmI,
 		"error_cause":              errorCause,
